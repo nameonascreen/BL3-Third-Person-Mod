@@ -1,0 +1,3891 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="31">
+  <Forms>
+    <Info Class="TCEForm" Encoding="Ascii85">b($/Y!ax+-,YT?-KMR-cd..PtNF$M0q[K@z2e]BohZ%BbfUxty-1#nsolCb*TUun^=%w2^bG}}Hp5vtP[=D+O^aE3.HIXaTieP2PyW4pHp5:yoyChW]@5L^!]O?U%)^0{go:NI65eg2^@hOGofRlxiy4Roc/e(_#ry#cu4cW$UB_D^czq*UXd)}e1]mxfyxTaSdHQP)T0xGl?fP+Ag]-x1Mej72QRGTN+0Xn]#kC[A!6anQ[KH!m;_5*.S/b.oIcVv{fwzaM[nC}LB2ZUuqdN#VmJznCX;!*l!D.}Ek77b2etw@M?D!:LPtIBsz]J4ahOUyw4=acL*k{!z41U+a*a,ztjQ{^aFn4!HND]_ZH8Q5_r#Ubb;3sgebRy6Hu^Q[wCf^8zLegYyf3}eca9V3vL$t_=w1QvU:HAYE46u[^iC%YQoyDsUyir#xX+Hj8[tfF544a1ya0;+3g%JroFxnORPT${w1</Info>
+  </Forms>
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24111</ID>
+      <Description>"Borderlands 3"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>6260EC</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Build: OAK-PATCHWIN64-79-CL-2173119"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>CED299</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24115</ID>
+      <Description>"-----------------------------------------------------------"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>554E4B</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24116</ID>
+      <Description>"Compact Mode"</Description>
+      <LastState/>
+      <Color>7C7570</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+function cycleFullCompact( sender, force )
+  local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+  if force ~= nil then
+    state = not force
+  end
+  compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+  getMainForm().Splitter1.Visible = state
+  getMainForm().Panel4.Visible = state
+  getMainForm().Panel5.Visible = state
+end
+
+function addCompactMenu()
+  if compactmenualreadyexists then return end
+    local parent = getMainForm().Menu.Items
+    compactmenuitem = createMenuItem( parent )
+    parent.add( compactmenuitem )
+    compactmenuitem.Caption = 'Compact View Mode'
+    compactmenuitem.OnClick = cycleFullCompact
+    compactmenualreadyexists = 'yes'
+end
+
+addCompactMenu()
+cycleFullCompact( nil, true )
+return "assert (true)"
+
+[DISABLE]
+
+cycleFullCompact( nil, false )
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"[ Enable ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>5C3A0E</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+-- Thanks Zanzer for the fucking syntax alignment!
+
+local _script = [[[ENABLE]
+
+  label( retGetGamePlayers_o )
+  registersymbol( retGetGamePlayers_o )
+
+  label( LocalPlayer )
+  registersymbol( LocalPlayer )
+  label( GameViewportClient )
+  registersymbol( GameViewportClient )
+  label( Console )
+  registersymbol( Console )
+  label( PlayerController )
+  registersymbol( PlayerController )
+  label( CheatManager )
+  registersymbol( CheatManager )
+  label( PlayerCharacter )
+  registersymbol( PlayerCharacter )
+  label( DeveloperPerks )
+  registersymbol( DeveloperPerks )
+
+  FViewportDraw_h:
+  mov [LocalPlayer],rax
+  mov rcx,[rax+70]
+  mov [GameViewportClient],rcx
+  mov rcx,[rcx+50]
+  mov [Console],rcx
+  mov rcx,[rax+30]
+  test rcx,rcx
+  je short @f
+    mov [PlayerController],rcx
+    mov rdx,[rcx+5A8]
+    mov [CheatManager],rdx
+    mov rcx,[rcx+488]               // if OakCharacter valid (we're in game world)
+    test rcx,rcx
+    je short @f
+      mov [PlayerCharacter],rcx
+      mov rcx,[rax+30]              // read OakPlayerController
+      mov rcx,[rcx+1A00]            // offset to OakDeveloperPerks
+      test rcx,rcx                  // check if not NULL first
+      je short @f
+        mov [DeveloperPerks],rcx    // store it
+        test byte ptr [rcx+C8],40   // flip UWorld_destroy bool
+        jne short @f
+          or byte ptr [rcx+C8],40
+  @@:
+  retGetGamePlayers_o:
+  readmem( retGetGamePlayers, 7 )
+  jmp retGetGamePlayers+7
+
+  align 10 CC
+
+  LocalPlayer:
+  dq 0
+
+  align 10 CC
+
+  GameViewportClient:
+  dq 0
+
+  align 10 CC
+
+  Console:
+  dq 0
+
+  align 10 CC
+
+  PlayerController:
+  dq 0
+
+  align 10 CC
+
+  CheatManager:
+  dq 0
+
+  align 10 CC
+
+  PlayerCharacter:
+  dq 0
+
+  align 10 CC
+
+  DeveloperPerks:
+  dq 0
+
+  align 10 CC
+
+  // hook
+  retGetGamePlayers:
+  jmp FViewportDraw_h
+  db 90 90
+
+]]..[[[DISABLE]
+
+  // restore
+  retGetGamePlayers:
+  readmem( retGetGamePlayers_o, 7 )
+
+  unregistersymbol( DeveloperPerks )
+  unregistersymbol( PlayerCharacter )
+  unregistersymbol( CheatManager )
+  unregistersymbol( PlayerController )
+  unregistersymbol( Console )
+  unregistersymbol( GameViewportClient )
+  unregistersymbol( LocalPlayer )
+
+  unregistersymbol( retGetGamePlayers_o )
+  unregistersymbol( retGetGamePlayers )
+
+  unregistersymbol( FViewportDraw_h )
+
+]]
+
+[ENABLE]
+
+local gameModule = getAddressSafe( process )
+local offset = 0x630
+local FViewportDraw_h = gameModule + offset
+fullAccess( FViewportDraw_h, 0x1000 - offset )
+unregisterSymbol( "FViewportDraw_h" )
+registerSymbol( "FViewportDraw_h", FViewportDraw_h, true )
+
+local aob_in_FViewportDraw = "488B40??4885C074??488B88????????4885C974??F681" --hooks the return from GetGamePlayers
+
+local sl = aobScanEx( aob_in_FViewportDraw )
+if sl.Count == 0 then return "assert (true)" end
+
+local retGetGamePlayers = tonumber( sl[0], 16 )
+unregisterSymbol( "retGetGamePlayers" )
+registerSymbol( "retGetGamePlayers", retGetGamePlayers, true )
+
+result, disableinfo = autoAssemble( _script )
+
+[DISABLE]
+
+autoAssemble( _script, disableinfo )
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>16274</ID>
+          <Description>"[ Engine ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24341</ID>
+              <Description>"Kill Tab in ConsoleKeys"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+killTabInConsoleKeys()
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24342</ID>
+              <Description>"Change ConsoleKey"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local s = inputQuery( "Change ConsoleKey", "Key:", "Backspace" )
+if string.len( s ) ~= 0x0 then changeConsoleKeyTo( s ) end
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16267</ID>
+              <Description>"Unrestrict CVars"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[
+aobscanmodule( hkProcessUserConsoleInput, ]] .. process .. [[, 488B1048????FF5218A8010F )
+registersymbol( hkProcessUserConsoleInput )
+label( hkProcessUserConsoleInput_o )
+registersymbol( hkProcessUserConsoleInput_o )
+
+alloc( Hook, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+
+Hook:
+mov byte ptr [rax+18],0
+hkProcessUserConsoleInput_o:
+readmem( hkProcessUserConsoleInput, 6 )
+jmp hkProcessUserConsoleInput+6
+
+hkProcessUserConsoleInput:
+jmp Hook
+db 90
+
+[DISABLE]
+
+hkProcessUserConsoleInput:
+readmem( hkProcessUserConsoleInput_o, 6 )
+
+dealloc( Hook )
+
+unregistersymbol( hkProcessUserConsoleInput_o )
+unregistersymbol( hkProcessUserConsoleInput )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16247</ID>
+              <Description>"Clear Console (works only with the Console active)"</Description>
+              <LastState/>
+              <Color>000000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local Console = getAddressSafe( "Console" )
+if Console ~= nil then
+  Console = readQword( Console )
+  if Console ~= 0x0 then
+    local mf_Console = readQword( Console )
+    local UConsole_ClearOutput = readQword( mf_Console + 0x290 )
+    executeCode( UConsole_ClearOutput, Console )
+  end
+end
+
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16303</ID>
+          <Description>"[ Scripts ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24025</ID>
+              <Description>"God Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+-- Thanks Zanzer for the fucking syntax alignment!
+
+local _script = [[[ENABLE]
+
+  aobscanmodule( aob_in_AActor_Tick, ]] .. process .. [[, F683????????100F84????????4889B424????????45 )
+  registersymbol( aob_in_AActor_Tick )
+  label( aob_in_AActor_Tick_o )
+  registersymbol( aob_in_AActor_Tick_o )
+
+  GodHook:
+  push rax
+  mov rax,[PlayerCharacter]
+  cmp rax,rbx
+  pop rax
+  jne short @f
+    and byte ptr [rbx+91],BF
+  aob_in_AActor_Tick_o:
+  readmem( aob_in_AActor_Tick, 7 )
+  jmp aob_in_AActor_Tick+7
+
+  align 10 CC
+
+  aob_in_AActor_Tick:
+  jmp GodHook
+  nop 2
+
+]]..[[[DISABLE]
+
+  aob_in_AActor_Tick:
+  readmem( aob_in_AActor_Tick_o, 7 )
+
+  unregistersymbol( aob_in_AActor_Tick_o )
+  unregistersymbol( aob_in_AActor_Tick )
+
+  unregistersymbol( GodHook )
+]]
+
+[ENABLE]
+
+local gameProcess = process
+local gameModule = getAddress( gameProcess )
+local offset = 0x770
+local GodHook = gameModule + offset
+fullAccess( GodHook, 0x1000 - offset )
+unregisterSymbol( "GodHook" )
+registerSymbol( "GodHook", GodHook, true )
+
+result, disableinfo = autoAssemble( _script )
+
+[DISABLE]
+
+autoAssemble( _script, disableinfo )
+
+local t = getAddressSafe( "PlayerCharacter" )
+if t ~= nil then
+  t = readQword( t )
+  if t ~= 0x0 then
+    local u = readBytes( t + 0x91 )
+    u = u | 0x40
+    writeBytes( t + 0x91, u )
+  end
+end
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"Infinite Clip Ammo"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+-- Thanks Zanzer for the fucking syntax alignment!
+
+local _script = [[[ENABLE]
+
+  aobscanmodule( OnFire, ]] .. process .. [[, 40534883EC??488B01488BD948896C24 )
+  registersymbol( OnFire )
+  label( OnFire_o )
+  registersymbol( OnFire_o )
+
+  ClipHook:
+  mov rax,[rcx+1A8]     // WeaponAmmoComponent-&gt;WeaponPrivate
+  test rax,rax
+  jne short @f
+    mov rax,[rcx+118]   // WeaponAmmoComponent-&gt;CachedWeapon
+    test rax,rax
+    je short OnFire_o
+  @@:
+  cmp [rax+4A0],0       // Weapon-&gt;WeaponUser
+  je short @f
+    mov rax,[rax+4A8]
+    mov rax,[rax-8F8]   // PlayerController
+    cmp rax,[PlayerController]
+    jne short @f
+      ret               // no ammo processing
+  @@:
+  OnFire_o:
+  readmem( OnFire, 6 )
+  jmp OnFire+6
+
+  align 10 CC
+
+  OnFire:
+  jmp ClipHook
+  db 90
+
+]]..[[[DISABLE]
+
+  OnFire:
+  readmem( OnFire_o, 6 )
+
+  unregistersymbol( OnFire )
+  unregistersymbol( OnFire_o )
+
+  unregistersymbol( ClipHook )
+]]
+
+[ENABLE]
+
+local gameProcess = process
+local gameModule = getAddress( gameProcess )
+local offset = 0x7A0
+local ClipHook = gameModule + offset
+fullAccess( ClipHook, 0x1000 - offset )
+unregisterSymbol( "ClipHook" )
+registerSymbol( "ClipHook", ClipHook, true )
+
+result, disableinfo = autoAssemble( _script )
+
+[DISABLE]
+
+autoAssemble( _script, disableinfo )
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24109</ID>
+          <Description>"[ SpawnAwesomeItems ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24106</ID>
+              <Description>"Set All ItemPools To .."</Description>
+              <LastState/>
+              <Color>808000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local UFunction = readQword( getAddressSafe( "UFunction_SpawnAwesomeItems" ) )
+local UScript = readQword( UFunction + 0x48 )
+
+local addr = inputQuery( "Set All Pools To", "ItemPoolData Address:", string.format( "%X", readQword( UScript + 0x0B ) ) )
+addr = tonumber( addr, 16 )
+
+local offsets_arr = { 0x0B, 0x14, 0x1D, 0x26, 0x2F, 0x38, 0x41, 0x4A, 0x76, 0x7F, 0x88 }
+for i = 1, #offsets_arr do
+  writeQword( UScript + offsets_arr[i], addr )
+end
+
+return "assert (true)"
+
+[DISABLE]
+
+--[[
+default UnrealScript:
++0x0B: ItemPoolData_1_1 (ItemPool_Artifacts_05_Legendary)
++0x14: ItemPoolData_1_2 (ItemPool_ClassMods_05_Legendary)
++0x1D: ItemPoolData_1_3 (ItemPool_GrenadeMods_05_Legendary)
++0x26: ItemPoolData_1_4 (ItemPool_Shields_05_Legendary)
++0x2F: ItemPoolData_1_5 (ItemPool_Guns_Legendary)
++0x38: ItemPoolData_1_6 (ItemPool_Guns_Legendary)
++0x41: ItemPoolData_1_7 (ItemPool_Guns_Legendary)
++0x4A: ItemPoolData_1_8 (ItemPool_Guns_Legendary)
++0x76: ItemPoolData_2_1 (ItemPool_Eridium_Stack)
++0x7F: ItemPoolData_2_2 (ItemPool_Eridium)
++0x88: ItemPoolData_2_3 (ItemPool_Money_Rich)
+]]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24092</ID>
+              <Description>"UFunction_SpawnAwesomeItems"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>UFunction_SpawnAwesomeItems</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24105</ID>
+                  <Description>"UnrealScript"</Description>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <GroupHeader>1</GroupHeader>
+                  <Address>UFunction_SpawnAwesomeItems+48</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>24094</ID>
+                      <Description>"ItemPoolData_1_1 (ItemPool_Artifacts_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+B</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24095</ID>
+                      <Description>"ItemPoolData_1_2 (ItemPool_ClassMods_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+14</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24096</ID>
+                      <Description>"ItemPoolData_1_3 (ItemPool_GrenadeMods_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+1D</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24097</ID>
+                      <Description>"ItemPoolData_1_4 (ItemPool_Shields_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+26</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24098</ID>
+                      <Description>"ItemPoolData_1_5 (ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+2F</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24099</ID>
+                      <Description>"ItemPoolData_1_6 (ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+38</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24100</ID>
+                      <Description>"ItemPoolData_1_7 (ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+41</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24101</ID>
+                      <Description>"ItemPoolData_1_8 (ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+4A</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24102</ID>
+                      <Description>"ItemPoolData_2_1 (ItemPool_Eridium_Stack)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+76</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24103</ID>
+                      <Description>"ItemPoolData_2_2 (ItemPool_Eridium)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+7F</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24104</ID>
+                      <Description>"ItemPoolData_2_3 (ItemPool_Money_Rich)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+88</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"[ Debug ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>8EA5F5</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24118</ID>
+          <Description>"LocalPlayer"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>6E6F6F</Color>
+          <GroupHeader>1</GroupHeader>
+          <Address>LocalPlayer</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24119</ID>
+              <Description>"LocalPlayer"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <Color>9D9A89</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24120</ID>
+              <Description>"[0030] PlayerController"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>6E6F6F</Color>
+              <GroupHeader>1</GroupHeader>
+              <Address>PlayerController</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24121</ID>
+                  <Description>"PlayerController"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>9D9A89</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24123</ID>
+                  <Description>"[0488] Pawn"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <Color>6E6F6F</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>488</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>24124</ID>
+                      <Description>"Pawn"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>9D9A89</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24148</ID>
+                      <Description>"[0091] bCanBeDamaged"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>Byte</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>91</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24149</ID>
+                      <Description>"[04C8] CharacterMovementComponent"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>4C8</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24150</ID>
+                          <Description>"CharacterMovementComponent"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24162</ID>
+                          <Description>"[0274] MaxWalkSpeed"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <Color>6E6F6F</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>274</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24151</ID>
+                              <Description>"[0004] MaxWalkSpeed_Current"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+4</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24165</ID>
+                              <Description>"[0008] MaxWalkSpeed_Default"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+8</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24166</ID>
+                          <Description>"[0298] MaxFlySpeed"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <Color>6E6F6F</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>298</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24167</ID>
+                              <Description>"[0004] MaxFlySpeed_Current"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+4</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24168</ID>
+                              <Description>"[0008] MaxFlySpeed_Default"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+8</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24164</ID>
+                      <Description>"[0580] JumpMaxCount"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>580</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24152</ID>
+                      <Description>"[0584] JumpCurrentCount"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>584</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24153</ID>
+                      <Description>"[0E88] AbilityManagerComponent "</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>E88</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24169</ID>
+                      <Description>"[0E70] ResourcePoolComponent"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>E70</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24170</ID>
+                          <Description>"ResourcePoolComponent"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24175</ID>
+                          <Description>"[[0180]+1*F8+A0] CurrentHealth"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1*F8+A0</Offset>
+                            <Offset>180</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24177</ID>
+                          <Description>"[[0180]+1*F8+AC] MaxHealth"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1*F8+AC</Offset>
+                            <Offset>180</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24174</ID>
+                          <Description>"[[0180]+1*F8+118] MaxShield"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1*F8+118</Offset>
+                            <Offset>180</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24173</ID>
+                          <Description>"[[0180]+1*F8+198] CurrentShield"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1*F8+198</Offset>
+                            <Offset>180</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24181</ID>
+                      <Description>"[0E78] OakDamageComponent"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>E78</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24182</ID>
+                          <Description>"OakDamageComponent"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24183</ID>
+                          <Description>"[07E8] bPassDamageToParent(1)|bDamageOnlyAppliesToParent(2)|bCanDamageCorpse(4)"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>7E8</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24187</ID>
+                          <Description>"[0820] LastHitBy"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>820</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24186</ID>
+                          <Description>"[0840] bGodMode(1)|bDemigodMode(2)"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>840</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24185</ID>
+                          <Description>"[0975] bDisableElementalDeaths"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>975</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24184</ID>
+                          <Description>"[09B0] IgnoreShield"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>9B0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24188</ID>
+                      <Description>"[0E98] OakCharacterInventory"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>E98</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24189</ID>
+                          <Description>"OakCharacterInventory"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24190</ID>
+                          <Description>"[0228] ??"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>228</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24191</ID>
+                              <Description>"[[+0000]+0018] Money"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>0+18</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24192</ID>
+                              <Description>"[[+0040]+0018] Eridium"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>40+18</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24193</ID>
+                          <Description>"[0230] Size"</Description>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>230</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24154</ID>
+                      <Description>"[0E90] StatusEffectManagerComponent"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>E90</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24179</ID>
+                      <Description>"[0EA0] OakCharacterBankInventory"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>EA0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24155</ID>
+                      <Description>"[10E0] FFYLComponent"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>10E0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24178</ID>
+                      <Description>"[12C8] DamageToVehicleFactor"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>12C8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24194</ID>
+                      <Description>"[[1518]+0008] CurrentWeapon"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>8</Offset>
+                        <Offset>1518</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24195</ID>
+                          <Description>"CurrentWeapon"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24202</ID>
+                          <Description>"[[0320]+2*8] WeaponRecoilPatternComponent"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <Color>6E6F6F</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>2*8</Offset>
+                            <Offset>320</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24203</ID>
+                              <Description>"WeaponRecoilPatternComponent"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <Color>9D9A89</Color>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24206</ID>
+                              <Description>"[01A0] RecoilPatternData"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>1A0</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24207</ID>
+                                  <Description>"RecoilPatternData"</Description>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <Color>9D9A89</Color>
+                                  <VariableType>8 Bytes</VariableType>
+                                  <Address>+0</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24208</ID>
+                                  <Description>"[0030] Samples"</Description>
+                                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                  <LastState Value="" RealAddress="00000000"/>
+                                  <Color>6E6F6F</Color>
+                                  <GroupHeader>1</GroupHeader>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>30</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>24209</ID>
+                                      <Description>"Samples"</Description>
+                                      <ShowAsHex>1</ShowAsHex>
+                                      <Color>9D9A89</Color>
+                                      <VariableType>8 Bytes</VariableType>
+                                      <Address>+0</Address>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24211</ID>
+                                      <Description>"[0000] Samples.Samples"</Description>
+                                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                      <LastState Value="" RealAddress="00000000"/>
+                                      <Color>6E6F6F</Color>
+                                      <GroupHeader>1</GroupHeader>
+                                      <Address>+0</Address>
+                                      <CheatEntries>
+                                        <CheatEntry>
+                                          <ID>24212</ID>
+                                          <Description>"Samples.Samples"</Description>
+                                          <ShowAsHex>1</ShowAsHex>
+                                          <Color>9D9A89</Color>
+                                          <VariableType>8 Bytes</VariableType>
+                                          <Address>+0</Address>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24213</ID>
+                                          <Description>"[0000] Attr1+0"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>0</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24217</ID>
+                                          <Description>"[0004] Attr1+4"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>4</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24216</ID>
+                                          <Description>"[0008] Attr2+0"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>8</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24215</ID>
+                                          <Description>"[000C] Attr2+4"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24219</ID>
+                                          <Description>"[0010] Attr3+0"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>10</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24220</ID>
+                                          <Description>"[0014] Attr3+4"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>14</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24221</ID>
+                                          <Description>"[0018] Attr4+0"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>18</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24222</ID>
+                                          <Description>"[001C] Attr4+4"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>1C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                      </CheatEntries>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24214</ID>
+                                      <Description>"[0008] NumSamples"</Description>
+                                      <VariableType>4 Bytes</VariableType>
+                                      <Address>+8</Address>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24204</ID>
+                          <Description>"[[0320]+3*8] WeaponSwayComponent"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <Color>6E6F6F</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>3*8</Offset>
+                            <Offset>320</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24205</ID>
+                              <Description>"WeaponSwayComponent"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <Color>9D9A89</Color>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24223</ID>
+                              <Description>"[0188] SwayPatternData"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>188</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24224</ID>
+                                  <Description>"SwayPatternData"</Description>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <Color>9D9A89</Color>
+                                  <VariableType>8 Bytes</VariableType>
+                                  <Address>+0</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24225</ID>
+                                  <Description>"[0030] Samples"</Description>
+                                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                  <LastState Value="" RealAddress="00000000"/>
+                                  <Color>6E6F6F</Color>
+                                  <GroupHeader>1</GroupHeader>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>30</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>24226</ID>
+                                      <Description>"Samples"</Description>
+                                      <ShowAsHex>1</ShowAsHex>
+                                      <Color>9D9A89</Color>
+                                      <VariableType>8 Bytes</VariableType>
+                                      <Address>+0</Address>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24227</ID>
+                                      <Description>"[0000] Samples.Samples"</Description>
+                                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                      <LastState Value="" RealAddress="00000000"/>
+                                      <Color>6E6F6F</Color>
+                                      <GroupHeader>1</GroupHeader>
+                                      <Address>+0</Address>
+                                      <CheatEntries>
+                                        <CheatEntry>
+                                          <ID>24228</ID>
+                                          <Description>"Samples.Samples"</Description>
+                                          <ShowAsHex>1</ShowAsHex>
+                                          <Color>9D9A89</Color>
+                                          <VariableType>8 Bytes</VariableType>
+                                          <Address>+0</Address>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24229</ID>
+                                          <Description>"[0000] Attr01+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>0</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24230</ID>
+                                          <Description>"[0004] Attr01+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>4</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24231</ID>
+                                          <Description>"[0008] Attr02+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>8</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24232</ID>
+                                          <Description>"[000C] Attr02+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24233</ID>
+                                          <Description>"[0010] Attr03+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>10</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24234</ID>
+                                          <Description>"[0014] Attr03+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>14</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24235</ID>
+                                          <Description>"[0018] Attr04+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>18</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24236</ID>
+                                          <Description>"[001C] Attr04+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>1C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24239</ID>
+                                          <Description>"[0020] Attr05+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>20</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24238</ID>
+                                          <Description>"[0024] Attr05+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>24</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24240</ID>
+                                          <Description>"[0028] Attr06+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>28</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24241</ID>
+                                          <Description>"[002C] Attr06+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>2C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24246</ID>
+                                          <Description>"[0030] Attr07+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>30</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24247</ID>
+                                          <Description>"[0034] Attr07+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>34</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24244</ID>
+                                          <Description>"[0038] Attr08+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>38</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24245</ID>
+                                          <Description>"[003C] Attr08+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>3C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24242</ID>
+                                          <Description>"[0040] Attr09+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>40</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24243</ID>
+                                          <Description>"[0044] Attr09+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>44</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24248</ID>
+                                          <Description>"[0048] Attr10+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>48</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24249</ID>
+                                          <Description>"[004C] Attr10+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>4C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24250</ID>
+                                          <Description>"[0050] Attr11+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>50</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24251</ID>
+                                          <Description>"[0054] Attr11+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>54</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24252</ID>
+                                          <Description>"[0058] Attr12+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>58</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24253</ID>
+                                          <Description>"[005C] Attr12+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>5C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24254</ID>
+                                          <Description>"[0060] Attr13+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>60</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24255</ID>
+                                          <Description>"[0064] Attr13+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>64</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24256</ID>
+                                          <Description>"[0068] Attr14+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>68</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24257</ID>
+                                          <Description>"[006C] Attr14+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>6C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24258</ID>
+                                          <Description>"[0070] Attr15+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>70</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24259</ID>
+                                          <Description>"[0074] Attr15+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>74</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24260</ID>
+                                          <Description>"[0078] Attr16+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>78</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24261</ID>
+                                          <Description>"[007C] Attr16+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>7C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24262</ID>
+                                          <Description>"[0080] Attr17+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>80</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24263</ID>
+                                          <Description>"[0084] Attr17+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>84</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24264</ID>
+                                          <Description>"[0088] Attr18+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>88</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24265</ID>
+                                          <Description>"[008C] Attr18+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>8C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24266</ID>
+                                          <Description>"[0090] Attr19+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>90</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24267</ID>
+                                          <Description>"[0094] Attr19+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>94</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24268</ID>
+                                          <Description>"[0098] Attr20+00"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>98</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                        <CheatEntry>
+                                          <ID>24269</ID>
+                                          <Description>"[009C] Attr20+04"</Description>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>9C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                      </CheatEntries>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24237</ID>
+                                      <Description>"[0008] NumSamples"</Description>
+                                      <VariableType>4 Bytes</VariableType>
+                                      <Address>+8</Address>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24270</ID>
+                              <Description>"[01A8] Speed"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>1A8</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24271</ID>
+                              <Description>"[01D4] ZoomSmoothingSpeed"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>1D4</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24272</ID>
+                              <Description>"[01D8] ZoomSmoothInTime_OnZoom"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>1D8</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24273</ID>
+                              <Description>"[01DC] ZoomSmoothInTime_OnZoom"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>1DC</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24200</ID>
+                          <Description>"[0470] WeaponFireProjectileComponent"</Description>
+                          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <Color>6E6F6F</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>470</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>24201</ID>
+                              <Description>"WeaponFireProjectileComponent"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <Color>9D9A89</Color>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24281</ID>
+                              <Description>"[0200] WeaponChargeComponent"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>200</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24282</ID>
+                                  <Description>"WeaponChargeComponent"</Description>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <Color>9D9A89</Color>
+                                  <VariableType>8 Bytes</VariableType>
+                                  <Address>+0</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24284</ID>
+                                  <Description>"[0198] ChargeTime"</Description>
+                                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                  <LastState Value="" RealAddress="00000000"/>
+                                  <Color>6E6F6F</Color>
+                                  <GroupHeader>1</GroupHeader>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>198</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>24285</ID>
+                                      <Description>"[0004] ChargeTime_Current"</Description>
+                                      <VariableType>Float</VariableType>
+                                      <Address>+4</Address>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24286</ID>
+                                      <Description>"[0008] ChargeTime_Default"</Description>
+                                      <VariableType>Float</VariableType>
+                                      <Address>+8</Address>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24287</ID>
+                                  <Description>"[01A4] DischargeTime"</Description>
+                                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                  <LastState Value="" RealAddress="00000000"/>
+                                  <Color>6E6F6F</Color>
+                                  <GroupHeader>1</GroupHeader>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>1A4</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>24288</ID>
+                                      <Description>"[0004] DischargeTime_Current"</Description>
+                                      <VariableType>Float</VariableType>
+                                      <Address>+4</Address>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24289</ID>
+                                      <Description>"[0008] DischargeTime_Default"</Description>
+                                      <VariableType>Float</VariableType>
+                                      <Address>+8</Address>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24290</ID>
+                                  <Description>"[01C4] OverchargeHoldTime"</Description>
+                                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                                  <LastState Value="" RealAddress="00000000"/>
+                                  <Color>6E6F6F</Color>
+                                  <GroupHeader>1</GroupHeader>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>1C4</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>24291</ID>
+                                      <Description>"[0004] OverchargeHoldTime_Current"</Description>
+                                      <VariableType>4 Bytes</VariableType>
+                                      <Address>+4</Address>
+                                    </CheatEntry>
+                                    <CheatEntry>
+                                      <ID>24292</ID>
+                                      <Description>"[0008] OverchargeHoldTime_Default"</Description>
+                                      <VariableType>4 Bytes</VariableType>
+                                      <Address>+8</Address>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24274</ID>
+                                  <Description>"[01D0] bChargeBeforeEachUse"</Description>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <VariableType>Byte</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>1D0</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24293</ID>
+                              <Description>"[0218] FireRate"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>218</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24294</ID>
+                                  <Description>"[0004] FireRate_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24295</ID>
+                                  <Description>"[0008] FireRate_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24296</ID>
+                              <Description>"[0224] AutomaticBurstCount"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>224</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24297</ID>
+                                  <Description>"[0004] AutomaticBurstCount_Current"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24298</ID>
+                                  <Description>"[0008] AutomaticBurstCount_Default"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24299</ID>
+                              <Description>"[0230] BurstFireDelay"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>230</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24300</ID>
+                                  <Description>"[0004] BurstFireDelay_Current"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24301</ID>
+                                  <Description>"[0008] BurstFireDelay_Default"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24283</ID>
+                              <Description>"[023C] bAutoBurst"</Description>
+                              <VariableType>Byte</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>23C</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24280</ID>
+                              <Description>"[025C] MinFireRateScale"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>25C</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24302</ID>
+                              <Description>"[0260] FireRateAccelDuration"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>260</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24303</ID>
+                                  <Description>"[0004] FireRateAccelDuration_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24304</ID>
+                                  <Description>"[0008] FireRateAccelDuration_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24305</ID>
+                              <Description>"[026C] FireRateDecelDuration"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>26C</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24306</ID>
+                                  <Description>"[0004] FireRateDecelDuration_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24307</ID>
+                                  <Description>"[0008] FireRateDecelDuration_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24279</ID>
+                              <Description>"[02C8] FireSequenceLength"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>2C8</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24308</ID>
+                              <Description>"[02E0] ShotAmmoCost"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>2E0</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24309</ID>
+                                  <Description>"[0004] ShotAmmoCost_Current"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24310</ID>
+                                  <Description>"[0008] ShotAmmoCost_Default"</Description>
+                                  <VariableType>4 Bytes</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24278</ID>
+                              <Description>"[02EC] MinShotAmmoCost"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>2EC</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24311</ID>
+                              <Description>"[02F0] Spread (Accuracy)"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>224</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24312</ID>
+                                  <Description>"[0004] AutomaticBurstCount_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24313</ID>
+                                  <Description>"[0008] AutomaticBurstCount_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24314</ID>
+                              <Description>"[02FC] AccuracyImpulse (Handling)"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>2FC</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24315</ID>
+                                  <Description>"[0004] AccuracyImpulse_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24316</ID>
+                                  <Description>"[0008] AccuracyImpulse_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24317</ID>
+                              <Description>"[0308] BurstAccuracyImpulseScale (Handling)"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>308</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24318</ID>
+                                  <Description>"[0004] BurstAccuracyImpulseScale_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24319</ID>
+                                  <Description>"[0008] BurstAccuracyImpulseScale_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24320</ID>
+                              <Description>"[0318] Damage"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>318</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24321</ID>
+                                  <Description>"[0004] Damage_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24322</ID>
+                                  <Description>"[0008] Damage_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24323</ID>
+                              <Description>"[0368] DamageRadius"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>368</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24324</ID>
+                                  <Description>"[0004] DamageRadius_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24325</ID>
+                                  <Description>"[0008] DamageRadius_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24326</ID>
+                              <Description>"[03B8] ImpactForce"</Description>
+                              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                              <LastState Value="" RealAddress="00000000"/>
+                              <Color>6E6F6F</Color>
+                              <GroupHeader>1</GroupHeader>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>3B8</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>24327</ID>
+                                  <Description>"[0004] ImpactForce_Current"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+4</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>24328</ID>
+                                  <Description>"[0008] ImpactForce_Default"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+8</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24277</ID>
+                              <Description>"[04E8] CurrentBurstShotCount"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>4E8</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24276</ID>
+                              <Description>"[0520] FireRatePercent"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>520</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>24275</ID>
+                              <Description>"[054C] DamageAmount"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>54C</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24210</ID>
+                          <Description>"[0480] WeaponType"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>480</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24197</ID>
+                          <Description>"[04A0] WeaponUser"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>4A0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24199</ID>
+                          <Description>"[0958] OakCharacter (BPWeap_BaseWeapon_C.OakCharacter)"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>958</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24198</ID>
+                          <Description>"[0960] Manufacturer (OakManufacturerData)"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>960</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24180</ID>
+                      <Description>"[1E50] OwnedVehicle"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1E50</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24156</ID>
+                      <Description>"[2318] bSanctuaryZeroGravity"</Description>
+                      <VariableType>Byte</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>2318</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24157</ID>
+                      <Description>"[26C0] GrenadeThrowCooldown"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>26C0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24158</ID>
+                      <Description>"[2AC8] PlayerBalanceStateComponent"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>2AC8</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24159</ID>
+                          <Description>"PlayerBalanceStateComponent"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24160</ID>
+                          <Description>"[01A4] Level"</Description>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1A4</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24161</ID>
+                          <Description>"[01D8] Experience"</Description>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1D8</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24122</ID>
+                  <Description>"[0510] AcknowledgedPawn"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>510</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24143</ID>
+                  <Description>"[0528] PlayerCameraManager"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <Color>6E6F6F</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>528</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>24144</ID>
+                      <Description>"PlayerCameraManager"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>9D9A89</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24145</ID>
+                      <Description>"[2BB0] CachedCameraShakeMod"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>2BB0</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>24146</ID>
+                          <Description>"CachedCameraShakeMod"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24147</ID>
+                          <Description>"[0028] CameraModifier .bExclusive|.bDebug"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>28</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24138</ID>
+                  <Description>"[05A8] CheatManager"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>5A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24330</ID>
+                  <Description>"[0C68] FogOfDiscoveryComponent"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <Color>6E6F6F</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>C68</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>24331</ID>
+                      <Description>"FogOfDiscoveryComponent"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>9D9A89</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24332</ID>
+                      <Description>"[01A8] PlayerUnfogRadius|VehicleUnfogRadius"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1A8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24333</ID>
+                  <Description>"[0A91] DifficultySetting"</Description>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>A91</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24340</ID>
+                  <Description>"[1638] bInfiniteAmmo"</Description>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>1638</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24140</ID>
+                  <Description>"[1A00] DeveloperPerks"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>1A00</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23964</ID>
+              <Description>"[0058] GameViewportClient"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>6E6F6F</Color>
+              <GroupHeader>1</GroupHeader>
+              <Address>GameViewportClient</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24125</ID>
+                  <Description>"GameViewportClient"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>9D9A89</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>GameViewportClient</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24126</ID>
+                  <Description>"[0050] ViewportConsole"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23961</ID>
+                  <Description>"[0088] World"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <Color>6E6F6F</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>24128</ID>
+                      <Description>"World"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>9D9A89</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>23938</ID>
+                      <Description>"[0030] PersistentLevel"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24129</ID>
+                      <Description>"[0140] AuthorityGameMode"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>140</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24133</ID>
+                      <Description>"[0148] GameState"</Description>
+                      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>6E6F6F</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>148</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>23940</ID>
+                          <Description>"GameState"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <Color>9D9A89</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24134</ID>
+                          <Description>"[06C8] InventoryShopResetPeriod"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>6C8</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24136</ID>
+                          <Description>"[06DC] ReplicatedSecondsBeforeShopsReset"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>6DC</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24135</ID>
+                          <Description>"[06E0] LocalSecondsBeforeShopsReset"</Description>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>6E0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24137</ID>
+                          <Description>"[0758] bInfiniteAmmo"</Description>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>758</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24130</ID>
+                      <Description>"[0160] Levels"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>160</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24131</ID>
+                      <Description>"[0170] LevelCollections"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>170</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>24132</ID>
+                      <Description>"[0190] OwningGameInstance"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>190</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24127</ID>
+                  <Description>"[0090] GameInstance"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>90</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24141</ID>
+          <Description>"ZoneMapGlobalsData"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>6E6F6F</Color>
+          <GroupHeader>1</GroupHeader>
+          <Address>ZoneMapGlobalsData</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24142</ID>
+              <Description>"ZoneMapGlobalsData"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <Color>9D9A89</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24336</ID>
+              <Description>"[0218] PlayerUnfogRadius"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+218</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24337</ID>
+              <Description>"[021C] VehicleUnfogRadius"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+21C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24338</ID>
+              <Description>"[0220] DefaultUnfogHeight"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+220</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24339</ID>
+              <Description>"[0224] DefaultVehicleUnfogHeight"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+224</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24334</ID>
+          <Description>"Mock-Up"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>6E6F6F</Color>
+          <GroupHeader>1</GroupHeader>
+          <Address/>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24335</ID>
+              <Description>"No description"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <Color>9D9A89</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>+0</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24078</ID>
+          <Description>"[ Not Updated ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>6E6F6F</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"Unreal Engine 'god' :)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local t = getAddressSafe( "OakPlayerController" )
+t = readQword( t )
+t = readQword( t + 0x488 ) -- OakCharacter
+local u = readBytes( t + 0x91 )
+u = u &amp; 0xBF
+writeBytes( t + 0x91, u )
+
+[DISABLE]
+
+local t = getAddressSafe( "OakPlayerController" )
+t = readQword( t )
+t = readQword( t + 0x488 ) -- OakCharacter
+local u = readBytes( t + 0x91 )
+u = u | 0x40
+writeBytes( t + 0x91, u )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"Init &amp; Link 'god' UFunction"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+alloc( ZConstructGodThread, 0x1000, Borderlands3.exe )
+registersymbol( ZConstructGodThread )
+CreateThread( ZConstructGodThread )
+
+label( pReturnFunction )
+label( pszGod )
+label( Z_Construct_UFunction_UCheatManager_God )
+registersymbol( Z_Construct_UFunction_UCheatManager_God )
+label( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+registersymbol( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+label( aZ_Construct_UFunction_UCheatManager_God )
+registersymbol( aZ_Construct_UFunction_UCheatManager_God )
+
+ZConstructGodThread:
+db EB FE
+sub rsp,178
+mov r8d,1
+lea rdx,[aZ_Construct_UFunction_UCheatManager_God]
+mov rcx,[Borderlands3.exe+66026A0]
+call Borderlands3.exe+147F3A0 // UClass::CreateLinkAndAddChildFunctionsToMap
+add rsp,178
+ret
+
+align 10 CC
+
+Z_Construct_UFunction_UCheatManager_God:
+  sub rsp,28
+  mov rax,[pReturnFunction]
+  test rax,rax
+  jne short @f
+    lea rdx,[Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams]
+    lea rcx,[pReturnFunction]
+    call Borderlands3.exe+14EE340 // UE4CodeGen_Private::ConstructUFunction
+    mov rax,[pReturnFunction]
+  @@:
+  add rsp,28
+  ret
+
+align 10 CC
+
+pReturnFunction:
+dq 0
+
+align 10 CC
+
+pszGod:
+db 'God',0
+
+align 10 CC
+
+Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams:
+dq Borderlands3.exe+2661100 // 0x0 - Z_Construct_UClass_UCheatManager
+dq pszGod                   // 0x8
+dq 0x45                     // 0x10
+dq 0                        // 0x18
+dq 04020600                 // 0x20
+dq 0                        // 0x28
+dq 0                        // 0x30
+dq 0                        // 0x38
+
+align 10 CC
+
+aZ_Construct_UFunction_UCheatManager_God:
+dq Z_Construct_UFunction_UCheatManager_God      // 0x0
+dq pszGod                                       // 0x8
+
+align 10 CC
+
+[DISABLE]
+
+unregistersymbol( Z_Construct_UFunction_UCheatManager_God )
+unregistersymbol( aZ_Construct_UFunction_UCheatManager_God )
+unregistersymbol( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+unregistersymbol( ZConstructGodThread )
+dealloc( ZConstructGodThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"Test_StaticFindUObject"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( UEThread, 0x1000, Borderlands3.exe )
+registersymbol( UEThread )
+CreateThread( UEThread )
+label( UEThreadOff )
+registersymbol( UEThreadOff )
+label( UEThread_loop )
+
+label( FindUObject_do )
+
+UEThread:
+sub rsp,28
+
+UEThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [UEThreadOff],1
+jne short @f
+  add rsp,28
+  mov [UEThreadOff],2
+  ret
+@@:
+
+  mov rcx,6E // VK_DECIMAL
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    call short FindUObject_do
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp short UEThread_loop
+
+align 10 CC
+
+FindUObject_do:
+sub rsp,28
+xor r9d,r9d
+lea r8,[szSpawnAwesomeItems]
+mov rax,[OakPlayerController]
+mov rax,[rax+1970]
+mov rdx,[rax+10]                    // 0x20: BlueprintGeneratedClass BP_DevPerks.BP_DevPerks_C
+mov rcx,[Borderlands3.exe+64D2020]  // 0x10: Class CoreUObject.Function
+call Borderlands3.exe+1500B80       // StaticFindObject
+add rsp,28
+ret
+
+align 10 CC
+
+szSpawnAwesomeItems:
+db 'S',0,'p',0,'a',0,'w',0,'n',0,'A',0,'w',0,'e',0,'s',0,'o',0,'m',0,'e',0,'I',0,'t',0,'e',0,'m',0,'s',0,0,0
+
+align 10 CC
+
+UEThreadOff:
+dd 0
+
+[DISABLE]
+
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "UEThreadOff" ) == 0 then --could be 2 already
+  writeInteger( "UEThreadOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "UEThreadOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+unregistersymbol( UEThreadOff )
+unregistersymbol( UEThread )
+dealloc( UEThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"UFunction SpawnAwesomeItems"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>282DDD80</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>16</ID>
+                  <Description>"UFlags"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+88</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>16229</ID>
+                  <Description>"UFunction_ByteCode"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>Array of byte</VariableType>
+                  <ByteLength>172</ByteLength>
+                  <Address>+48</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>16230</ID>
+                      <Description>"ItemPoolData_1_1 (ItemPoolData ItemPool_Artifacts_05_Legendary.ItemPool_Artifacts_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+B</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16231</ID>
+                      <Description>"ItemPoolData_1_2 (ItemPoolData ItemPool_ClassMods_05_Legendary.ItemPool_ClassMods_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+14</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16232</ID>
+                      <Description>"ItemPoolData_1_3 (ItemPoolData ItemPool_GrenadeMods_05_Legendary.ItemPool_GrenadeMods_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+1D</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16233</ID>
+                      <Description>"ItemPoolData_1_4 (ItemPoolData ItemPool_Shields_05_Legendary.ItemPool_Shields_05_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+26</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16234</ID>
+                      <Description>"ItemPoolData_1_5 (ItemPoolData ItemPool_Guns_Legendary.ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+2F</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16235</ID>
+                      <Description>"ItemPoolData_1_6 (ItemPoolData ItemPool_Guns_Legendary.ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+38</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16236</ID>
+                      <Description>"ItemPoolData_1_7 (ItemPoolData ItemPool_Guns_Legendary.ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+41</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16237</ID>
+                      <Description>"ItemPoolData_1_8 (ItemPoolData ItemPool_Guns_Legendary.ItemPool_Guns_Legendary)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+4A</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16238</ID>
+                      <Description>"ItemPoolData_2_1 (ItemPoolData ItemPool_Eridium_Stack.ItemPool_Eridium_Stack)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+76</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16239</ID>
+                      <Description>"ItemPoolData_2_2 (ItemPoolData ItemPool_Eridium.ItemPool_Eridium)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+7F</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16240</ID>
+                      <Description>"ItemPoolData_2_3 (ItemPoolData ItemPool_Money_Rich.ItemPool_Money_Rich)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+88</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16225</ID>
+              <Description>"Item Spawner"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+alloc( UEThread, 0x1000, Borderlands3.exe )
+registersymbol( UEThread )
+CreateThread( UEThread )
+label( UEThreadOff )
+registersymbol( UEThreadOff )
+label( UEThread_loop )
+
+label( SpawnItem_do )
+
+label( iAmount )
+registersymbol( iAmount )
+label( ppItemPoolArr )
+registersymbol( ppItemPoolArr )
+label( pItemPool )
+registersymbol( pItemPool )
+
+UEThread:
+sub rsp,28
+
+UEThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [UEThreadOff],1
+jne short @f
+  add rsp,28
+  mov [UEThreadOff],2
+  ret
+@@:
+
+  mov rcx,6E // VK_DECIMAL
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    call short SpawnItem_do
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp short UEThread_loop
+
+align 10 CC
+
+SpawnItem_do:
+sub rsp,38
+mov r8d,[iAmount]              // item amount
+lea rdx,[ppItemPoolArr]        // pointer to pointer to ItemPoolArr
+mov rcx,[OakDeveloperPerks]    // UObject
+call Borderlands3.exe+BAF140   // SpawnItems_Internal
+add rsp,38
+ret
+
+align 10 CC
+
+iAmount:
+dd 1
+
+align 10 CC
+
+ppItemPoolArr:
+dq pItemPool
+dd 1                         // dwArrSize (expand this to &gt; 1 if you add more items in pItemPool
+
+align 10 CC
+
+pItemPool:
+dq 0
+dq 0
+
+UEThreadOff:
+dd 0
+
+[DISABLE]
+
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "UEThreadOff" ) == 0 then --could be 2 already
+  writeInteger( "UEThreadOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "UEThreadOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+unregistersymbol( pItemPool )
+unregistersymbol( ppItemPoolArr )
+unregistersymbol( iAmount )
+
+unregistersymbol( UEThreadOff )
+unregistersymbol( UEThread )
+dealloc( UEThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>16226</ID>
+                  <Description>"iAmount"</Description>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>iAmount</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>16227</ID>
+                  <Description>"pItemPool"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>FF8080</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>pItemPool</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16241</ID>
+              <Description>"Assemble execOpenDebugMenu"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+alloc( execOpenDebugMenu, 0x1000, Borderlands3.exe )
+registersymbol( execOpenDebugMenu )
+
+label( szCheatMenuData )
+label( szGbxCheatSettings )
+
+label( @L00000001 )
+label( @L00000002 )
+label( @L00000003 )
+label( @L00000004 )
+label( @L00000005 )
+label( @L00000006 )
+
+execOpenDebugMenu:
+
+	mov [rsp+10],rbp
+	mov [rsp+18],rsi
+	push rdi
+	sub rsp,50
+	mov rax,[rcx]
+	mov rdi,rcx
+	call qword ptr [rax+F88] // this changes
+	xor ebp,ebp
+	mov rsi,rax
+	mov [rsp+40],rbp
+	mov [rsp+48],rbp
+	test rax,rax
+	je @L00000006
+	mov rcx,[Borderlands3.exe+687E470] // GConfig
+	test rcx,rcx
+	je @L00000006
+	lea rax,[Borderlands3.exe+688A670] // path to Engine.ini
+	lea r9,[rsp+40]
+	mov [rsp+20],rax
+	lea r8,[szCheatMenuData] // L"CheatMenuData"
+	lea rdx,[szGbxCheatSettings] // L"GbxCheatSettings"
+	call Borderlands3.exe+158BCB0 // FConfigCacheIni::GetString
+	test al,al
+	je @L00000005
+	cmp [rsp+48],ebp
+	mov [rsp+60],rbx
+	lea rbx,[Borderlands3.exe+400DB18] // 0
+	cmovne rbx,[rsp+40]
+	call Borderlands3.exe+1BF5DF50 // GbxUmgMenuData::GetPrivateStaticClass
+	mov byte ptr [rsp+30],1
+	xor r9d,r9d
+	mov [rsp+28],rbp
+	mov r8,rbx
+	xor edx,edx
+	mov [rsp+20],ebp
+	mov rcx,rax
+	call Borderlands3.exe+16E3260 // StaticLoadObject
+	mov rbx,rax
+	test rax,rax
+	je short @L00000004
+	cmp [rax+48],rbp
+	je short @L00000002
+	call Borderlands3.exe+1BF5DCB0 // GbxUmgMenu::GetPrivateStaticClass
+	mov rdx,[rbx+48]
+	mov rcx,rdx
+	test rdx,rdx
+	je short @L00000002
+
+@L00000001:
+	cmp rcx,rax
+	je short @L00000003
+	mov rcx,[rcx+30]
+	test rcx,rcx
+	jne short @L00000001
+
+@L00000002:
+	mov rdx,rbp
+
+@L00000003:
+	mov rcx,[rdi+A78] // this changes
+	call Borderlands3.exe+2DF2380
+	test al,al
+	jne short @L00000004
+	mov rdx,rbx
+	mov rcx,rsi
+	call Borderlands3.exe+2E0DBD0
+
+@L00000004:
+	mov rbx,[rsp+60]
+
+@L00000005:
+	mov rcx,[rsp+40]
+	test rcx,rcx
+	je short @L00000006
+	call Borderlands3.exe+1532090 // FMemory::Free
+
+@L00000006:
+	mov rbp,[rsp+68]
+	mov rsi,[rsp+70]
+	add rsp,50
+	pop rdi
+	ret
+
+align 10 CC
+
+szCheatMenuData:
+db 'C',0,'h',0,'e',0,'a',0,'t',0,'M',0,'e',0,'n',0,'u',0,'D',0,'a',0,'t',0,'a',0,0,0
+
+align 10 CC
+
+szGbxCheatSettings:
+db 'G',0,'b',0,'x',0,'C',0,'h',0,'e',0,'a',0,'t',0,'S',0,'e',0,'t',0,'t',0,'i',0,'n',0,'g',0,'s',0,0,0
+
+[DISABLE]
+
+dealloc( execOpenDebugMenu )
+unregistersymbol( execOpenDebugMenu )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"Restore 'god', 'playersonly', 'fly', 'ghost', 'walk'"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local gameProcess = "Borderlands3.exe"
+local gameModule = getAddress( gameProcess )
+
+autoAssemble([[
+
+  alloc( ReCode, 0x1000, Borderlands3.exe )
+  registersymbol( ReCode )
+
+  label( UCheatManager_PlayersOnly )
+  registersymbol( UCheatManager_PlayersOnly )
+  label( UCharacter_ClientCheatWalk_Implementation )
+  registersymbol( UCharacter_ClientCheatWalk_Implementation )
+  label( UCharacter_ClientCheatFly_Implementation )
+  registersymbol( UCharacter_ClientCheatFly_Implementation )
+  label( UCharacter_ClientCheatGhost_Implementation )
+  registersymbol( UCharacter_ClientCheatGhost_Implementation )
+
+  label( Init )
+  registersymbol( Init )
+  label( Init_exit )
+  label( ConstructUFunctions )
+  registersymbol( ConstructUFunctions )
+  label( Z_Construct_UClass_UCheatManager_Statics_FuncInfo )
+  registersymbol( Z_Construct_UClass_UCheatManager_Statics_FuncInfo )
+  label( Z_Construct_UFunction_UCheatManager_God )
+  registersymbol( Z_Construct_UFunction_UCheatManager_God )
+  label( Z_Construct_UFunction_UCheatManager_Ghost )
+  registersymbol( Z_Construct_UFunction_UCheatManager_Ghost )
+  label( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+  registersymbol( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+  label( Z_Construct_UFunction_UCheatManager_Ghost_Statics_FuncParams )
+  registersymbol( Z_Construct_UFunction_UCheatManager_Ghost_Statics_FuncParams )
+  label( UFunction_God )
+  registersymbol( UFunction_God )
+  label( UFunction_Ghost )
+  registersymbol( UFunction_Ghost )
+
+  label( pszGod )
+  label( pszGhost )
+  label( pszSpawnAwesomeItems )
+
+  CreateThread( Init )
+
+  ReCode:
+
+  UCheatManager_PlayersOnly:
+  push rdi
+  sub rsp,20
+  mov rax,[rcx]
+  mov rdi,rcx
+  call qword ptr [rax+148]        // UCheatManager::GetWorld
+  test byte ptr [rax+830],0x80    // bPlayersOnly
+  jne short @f
+    mov rax,[rdi]
+    mov rcx,rdi
+    call qword ptr [rax+148]      // UCheatManager::GetWorld
+    test [rax+830],0x100          // bPlayersOnlyPending
+    jne short @f
+      mov rax,[rdi]
+      mov rcx,rdi
+      mov [rsp+30],rbx
+      call qword ptr [rax+148]    // UCheatManager::GetWorld
+      mov rdx,[rdi]
+      mov rcx,rdi
+      mov rbx,rax
+      call qword ptr [rdx+148]    // UCheatManager::GetWorld
+      mov ecx,[rbx+830]           // bPlayersOnlyPending
+      mov rbx,[rsp+30]
+      not ecx                     // = !bPlayersOnlyPending
+      xor ecx,[rax+830]
+      and ecx,0x100
+      xor [rax+830],ecx
+      add rsp,20
+      pop rdi
+      ret
+  @@:
+  mov rax,[rdi]
+  mov rcx,rdi
+  call qword ptr [rax+148]        // UCheatManager::GetWorld
+  mov rcx,rdi
+  and [rax+830],0xFFFFFF7F        // bPlayersOnly = false
+  mov rax,[rdi]
+  call qword ptr [rax+148]        // UCheatManager::GetWorld
+  and [rax+830],0xFFFFFEFF        // bPlayersOnlyPending = false
+  add rsp,20
+  pop rdi
+  ret
+
+  align 10 CC
+
+  UCharacter_ClientCheatFly_Implementation:
+  push rbx
+  sub rsp,20
+  mov dl,1
+  mov rbx,rcx
+  call Borderlands3.exe+1F7F1C0  // AActor::SetActorEnableCollision
+  mov rax,[rbx+4C8]
+  test rax,rax
+  je short @f
+    or [rax+4B4],400
+    xor r8d,r8d
+    mov rcx,[rbx+4C8]
+    lea edx,[r8+5]
+    mov rax,[rcx]
+    add rsp,20
+    pop rbx
+    jmp qword ptr [rax+5A0]       // UCharacterMovementComponent::SetMovementMode
+  @@:
+  add rsp,20
+  pop rbx
+  ret
+
+  align 10 CC
+
+  UCharacter_ClientCheatGhost_Implementation:
+  push rbx
+  sub rsp,20
+  xor edx,edx
+  mov rbx,rcx
+  call Borderlands3.exe+1F7F1C0  // AActor::SetActorEnableCollision
+  mov rax,[rbx+4C8]
+  test rax,rax
+  je short @f
+    or [rax+4B4],400
+    xor r8d,r8d
+    mov rcx,[rbx+4C8]
+    lea edx,[r8+5]
+    mov rax,[rcx]
+    add rsp,20
+    pop rbx
+    jmp qword ptr [rax+5A0]       // UCharacterMovementComponent::SetMovementMode
+  @@:
+  add rsp,20
+  pop rbx
+  ret
+
+  align 10 CC
+
+  UCharacter_ClientCheatWalk_Implementation:
+  push rbx
+  sub rsp,20
+  mov dl,1
+  mov rbx,rcx
+  call Borderlands3.exe+1F7F1C0  // AActor::SetActorEnableCollision
+  mov rax,[rbx+4C8]
+  test rax,rax
+  je short @f
+    and [rax+4B4],BFF
+    xor r8d,r8d
+    mov rcx,[rbx+4C8]
+    lea edx,[r8+3]
+    mov rax,[rcx]
+    add rsp,20
+    pop rbx
+    jmp qword ptr [rax+5A0]       // UCharacterMovementComponent::SetMovementMode
+  @@:
+  add rsp,20
+  pop rbx
+  ret
+
+  align 10 CC
+
+  Init:
+  sub rsp,28
+  xor r9d,r9d
+  lea r8,[pszSpawnAwesomeItems]
+  mov rax,[OakPlayerController]
+  mov rax,[rax+1970]
+  test rax,rax                          // if this is NULL by the time the user enables this script, abort
+  je short Init_exit
+    mov rdx,[rax+10]                    // 0x20: BlueprintGeneratedClass BP_DevPerks.BP_DevPerks_C
+    mov rcx,[Borderlands3.exe+64D6EA0]  // 0x10: Class CoreUObject.Function
+    call Borderlands3.exe+14F9D80       // StaticFindObject
+    test rax,rax
+    je short @f
+      mov dword ptr [rax+88],4020600    // patch UFunction flags
+    @@:
+    call ConstructUFunctions
+  Init_exit:
+  add rsp,28
+  ret
+
+  align 10 CC
+
+  ConstructUFunctions:
+  sub rsp,178
+  mov r8d,2                                                   // uint32 NumFunctions
+  lea rdx,[Z_Construct_UClass_UCheatManager_Statics_FuncInfo] // FClassFunctionLinkInfo* Functions
+  mov rcx,[Borderlands3.exe+6607640]                          // Class Engine.CheatManager
+  call Borderlands3.exe+14785A0                               // UClass::CreateLinkAndAddChildFunctionsToMap
+  add rsp,178
+  ret
+
+  align 10 CC
+
+  Z_Construct_UFunction_UCheatManager_God:
+  sub rsp,28
+  mov rax,[UFunction_God]
+  test rax,rax
+  jne short @f
+    lea rdx,[Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams]
+    lea rcx,[UFunction_God]
+    call Borderlands3.exe+14E7540 // UE4CodeGen_Private::ConstructUFunction
+    mov rax,[UFunction_God]
+  @@:
+  add rsp,28
+  ret
+
+  align 10 CC
+
+  Z_Construct_UFunction_UCheatManager_Ghost:
+  sub rsp,28
+  mov rax,[UFunction_Ghost]
+  test rax,rax
+  jne short @f
+    lea rdx,[Z_Construct_UFunction_UCheatManager_Ghost_Statics_FuncParams]
+    lea rcx,[UFunction_Ghost]
+    call Borderlands3.exe+14E7540 // UE4CodeGen_Private::ConstructUFunction
+    mov rax,[UFunction_Ghost]
+  @@:
+  add rsp,28
+  ret
+
+  align 10 CC
+
+  UFunction_God:
+  dq 0
+
+  align 10 CC
+
+  UFunction_Ghost:
+  dq 0
+
+  align 10 CC
+
+  pszGod:
+  db 'God',0
+
+  align 10 CC
+
+  pszGhost:
+  db 'Ghost',0
+
+  align 10 CC
+
+  pszSpawnAwesomeItems:
+  db 'S',0,'p',0,'a',0,'w',0,'n',0,'A',0,'w',0,'e',0,'s',0,'o',0,'m',0,'e',0,'I',0,'t',0,'e',0,'m',0,'s',0,0,0
+
+  align 10 CC
+
+  Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams:
+  dq Borderlands3.exe+265A7C0 // 0x00 -&gt; Z_Construct_UClass_UCheatManager
+  dq pszGod                   // 0x08
+  dq 0x45                     // 0x10
+  dq 0                        // 0x18
+  dq 04020600                 // 0x20
+  dq 0                        // 0x28
+  dq 0                        // 0x30
+  dq 0                        // 0x38
+  dq 0
+
+  align 10 CC
+
+  Z_Construct_UFunction_UCheatManager_Ghost_Statics_FuncParams:
+  dq Borderlands3.exe+265A7C0 // 0x00 -&gt; Z_Construct_UClass_UCheatManager
+  dq pszGhost                 // 0x08
+  dq 0x45                     // 0x10
+  dq 0                        // 0x18
+  dq 04020600                 // 0x20
+  dq 0                        // 0x28
+  dq 0                        // 0x30
+  dq 0                        // 0x38
+  dq 0
+
+  align 10 CC
+
+  Z_Construct_UClass_UCheatManager_Statics_FuncInfo:
+  dq Z_Construct_UFunction_UCheatManager_God      // 0x00
+  dq pszGod                                       // 0x08
+  dq Z_Construct_UFunction_UCheatManager_Ghost    // 0x10
+  dq pszGhost                                     // 0x18
+  dq 0
+
+]])
+
+-- might need some Sleep
+
+Sleep( 2000 )
+
+-- restore the execs in God and Ghost UFunctions
+
+local UFunction_God = readQword( getAddressSafe( "UFunction_God" ) )
+local UFunction_Ghost = readQword( getAddressSafe( "UFunction_Ghost" ) )
+-- UCheatManager::execGod
+local UCheatManager_execGod = gameModule + 0x2689790
+-- UCheatManager::execGhost
+local UCheatManager_execGhost = gameModule + 0x26898D0
+writeQword( UFunction_God + 0xB0, UCheatManager_execGod )
+writeQword( UFunction_Ghost + 0xB0, UCheatManager_execGhost )
+
+-- patch the UCheatManager functions back in
+
+-- OakPlayerController
+local OakPlayerController = readQword( getAddressSafe( "OakPlayerController" ) )
+-- OakCheatManager
+local OakCheatManager = readQword( OakPlayerController + 0x5A8 )
+-- member-functions pointer
+local mf_OakCheatManager = readQword( OakCheatManager )
+-- UCheatManager::Fly
+local UCheatManager_Fly = gameModule + 0x20525D0
+-- UCheatManager::Walk
+local UCheatManager_Walk = gameModule + 0x2065930
+-- UCheatManager::Ghost
+local UCheatManager_Ghost = gameModule + 0x2055920
+-- UCheatManager::God
+local UCheatManager_God = gameModule + 0x2055A30
+-- UCheatManager::PlayersOnly
+local UCheatManager_PlayersOnly = getAddressSafe( "UCheatManager_PlayersOnly" )
+fullAccess( mf_OakCheatManager + 0x2A0, 8 )
+writeQword( mf_OakCheatManager + 0x2A0, UCheatManager_Fly )
+fullAccess( mf_OakCheatManager + 0x2A8, 8 )
+writeQword( mf_OakCheatManager + 0x2A8, UCheatManager_Walk )
+fullAccess( mf_OakCheatManager + 0x2B0, 8 )
+writeQword( mf_OakCheatManager + 0x2B0, UCheatManager_Ghost )
+fullAccess( mf_OakCheatManager + 0x2B8, 8 )
+writeQword( mf_OakCheatManager + 0x2B8, UCheatManager_God )
+fullAccess( mf_OakCheatManager + 0x2F8, 8 )
+writeQword( mf_OakCheatManager + 0x2F8, UCheatManager_PlayersOnly )
+
+-- patch the UOakChararacter ClientCheat functions back in
+
+-- OakCharacter
+local OakCharacter = readQword( OakPlayerController + 0x488 )
+-- member-functions pointer
+local mf_OakCharacter = readQword( OakCharacter )
+-- ACharacter::ClientCheatWalk_Implementation
+local UCharacter_ClientCheatWalk_Implementation = getAddressSafe( "UCharacter_ClientCheatWalk_Implementation" )
+-- ACharacter::ClientCheatFly_Implementation
+local UCharacter_ClientCheatFly_Implementation = getAddressSafe( "UCharacter_ClientCheatFly_Implementation" )
+-- ACharacter::ClientCheatGhost_Implementation
+local UCharacter_ClientCheatGhost_Implementation = getAddressSafe( "UCharacter_ClientCheatGhost_Implementation" )
+fullAccess( mf_OakCharacter + 0x928, 8 )
+writeQword( mf_OakCharacter + 0x928, UCharacter_ClientCheatWalk_Implementation )
+fullAccess( mf_OakCharacter + 0x930, 8 )
+writeQword( mf_OakCharacter + 0x930, UCharacter_ClientCheatFly_Implementation )
+fullAccess( mf_OakCharacter + 0x938, 8 )
+writeQword( mf_OakCharacter + 0x938, UCharacter_ClientCheatGhost_Implementation )
+
+[DISABLE]
+
+{$asm}
+
+unregistersymbol( UFunction_Ghost )
+unregistersymbol( UFunction_God )
+unregistersymbol( Z_Construct_UFunction_UCheatManager_Ghost_Statics_FuncParams )
+unregistersymbol( Z_Construct_UFunction_UCheatManager_God_Statics_FuncParams )
+unregistersymbol( Z_Construct_UFunction_UCheatManager_Ghost )
+unregistersymbol( Z_Construct_UFunction_UCheatManager_God )
+unregistersymbol( Z_Construct_UClass_UCheatManager_Statics_FuncInfo )
+unregistersymbol( ConstructUFunctions )
+
+unregistersymbol( UCharacter_ClientCheatGhost_Implementation )
+unregistersymbol( UCharacter_ClientCheatFly_Implementation )
+unregistersymbol( UCharacter_ClientCheatWalk_Implementation )
+unregistersymbol( UCheatManager_PlayersOnly )
+
+dealloc( ReCode )
+unregistersymbol( ReCode )
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24107</ID>
+      <Description>"[ Utils ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>D0D1C7</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24108</ID>
+          <Description>"Kill SteamId Display"</Description>
+          <LastState/>
+          <Color>D0D1C7</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+
+Borderlands3.exe+A48EB7F:
+db 90 E9
+
+[DISABLE]
+
+Borderlands3.exe+A48EB7F:
+db 0F 8E
+
+/*
+Borderlands3.exe+A48EB7F - 0F8E DE020000         - jng Borderlands3.exe+A48EE63 &lt;-- JMP
+Borderlands3.exe+A48EB85 - 85 C0                 - test eax,eax
+Borderlands3.exe+A48EB87 - 4C 89 7C 24 40        - mov [rsp+40],r15
+Borderlands3.exe+A48EB8C - 4C 8D 35 855C95F9     - lea r14,[Borderlands3.exe+3DE4818] { (0) }
+Borderlands3.exe+A48EB93 - 4C 89 7C 24 48        - mov [rsp+48],r15
+Borderlands3.exe+A48EB98 - 4C 0F45 74 24 50      - cmovne r14,[rsp+50]
+Borderlands3.exe+A48EB9E - 4D 85 F6              - test r14,r14
+Borderlands3.exe+A48EBA1 - 74 43                 - je Borderlands3.exe+A48EBE6
+Borderlands3.exe+A48EBA3 - 66 45 39 3E           - cmp [r14],r15w
+Borderlands3.exe+A48EBA7 - 74 3D                 - je Borderlands3.exe+A48EBE6
+Borderlands3.exe+A48EBA9 - 48 89 FB              - mov rbx,rdi
+Borderlands3.exe+A48EBAC - 0F1F 40 00            - nop dword ptr [rax+00]
+Borderlands3.exe+A48EBB0 - 48 FF C3              - inc rbx
+Borderlands3.exe+A48EBB3 - 66 45 39 3C 5E        - cmp [r14+rbx*2],r15w
+Borderlands3.exe+A48EBB8 - 75 F6                 - jne Borderlands3.exe+A48EBB0
+Borderlands3.exe+A48EBBA - FF C3                 - inc ebx
+Borderlands3.exe+A48EBBC - 89 5C 24 48           - mov [rsp+48],ebx
+Borderlands3.exe+A48EBC0 - 85 DB                 - test ebx,ebx
+Borderlands3.exe+A48EBC2 - 7E 11                 - jle Borderlands3.exe+A48EBD5
+Borderlands3.exe+A48EBC4 - 31 D2                 - xor edx,edx
+Borderlands3.exe+A48EBC6 - 48 8D 4C 24 40        - lea rcx,[rsp+40]
+Borderlands3.exe+A48EBCB - E8 E05DF8F5           - call Borderlands3.exe+4149B0
+Borderlands3.exe+A48EBD0 - 4C 8B 7C 24 40        - mov r15,[rsp+40]
+Borderlands3.exe+A48EBD5 - 4C 63 C3              - movsxd  r8,ebx
+Borderlands3.exe+A48EBD8 - 4C 89 F2              - mov rdx,r14
+Borderlands3.exe+A48EBDB - 4D 01 C0              - add r8,r8
+Borderlands3.exe+A48EBDE - 4C 89 F9              - mov rcx,r15
+Borderlands3.exe+A48EBE1 - E8 9AA4FFF6           - call Borderlands3.exe+1489080
+Borderlands3.exe+A48EBE6 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+Borderlands3.exe+A48EBEB - 48 8D 8D 40010000     - lea rcx,[rbp+00000140]
+Borderlands3.exe+A48EBF2 - E8 296003F7           - call Borderlands3.exe+14C4C20
+Borderlands3.exe+A48EBF7 - 4C 8D 0D 5A0900FA     - lea r9,[Borderlands3.exe+448F558] { ("LogInTextPrompt") }
+Borderlands3.exe+A48EBFE - 49 89 C7              - mov r15,rax
+Borderlands3.exe+A48EC01 - 4C 8D 05 700900FA     - lea r8,[Borderlands3.exe+448F578] { ("GFxOakTitleScreen") }
+Borderlands3.exe+A48EC08 - 48 8D 15 910900FA     - lea rdx,[Borderlands3.exe+448F5A0] { ("Signing in {0}") }
+Borderlands3.exe+A48EC0F - 48 8D 8D 80000000     - lea rcx,[rbp+00000080]
+*/
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24093</ID>
+          <Description>"Fake SHiFT Id"</Description>
+          <LastState/>
+          <Color>D0D1C7</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">define(Hook,Borderlands3.exe+1C2D1F90)
+
+[ENABLE]
+
+alloc( Cave, 0x1000, Borderlands3.exe )
+label( Hook_o )
+registersymbol( Hook_o )
+label( back )
+
+Cave:
+mov rcx,[rdi+20]
+test rcx,rcx
+je short @f
+  lea rdx,[FakeId]
+  movups xmm15,[rdx]
+  movups [rcx],xmm15
+  movsd xmm15,[rdx+10]
+  movsd [rcx+10],xmm15
+Hook_o:
+readmem( Hook, 7 )
+jmp back
+
+align 10 CC
+
+FakeId:
+dw 'elsunny069',0
+
+Hook:
+jmp Cave
+nop 2
+back:
+
+[DISABLE]
+
+Hook:
+readmem( Hook_o, 7 )
+
+unregistersymbol( Hook_o )
+dealloc( Cave )
+
+/*
+Borderlands3.exe+1C2D1F90 - 48 8B 4D F0           - mov rcx,[rbp-10] &lt;--
+Borderlands3.exe+1C2D1F94 - 48 85 C9              - test rcx,rcx
+Borderlands3.exe+1C2D1F97 - 74 05                 - je Borderlands3.exe+1C2D1F9E
+Borderlands3.exe+1C2D1F99 - E8 622B1FE5           - call Borderlands3.exe+14C4B00
+Borderlands3.exe+1C2D1F9E - 31 D2                 - xor edx,edx
+Borderlands3.exe+1C2D1FA0 - 48 89 75 F0           - mov [rbp-10],rsi
+Borderlands3.exe+1C2D1FA4 - 48 8D 4D F0           - lea rcx,[rbp-10]
+Borderlands3.exe+1C2D1FA8 - 48 C7 45 F8 11000000  - mov qword ptr [rbp-08],00000011 { 17 }
+Borderlands3.exe+1C2D1FB0 - E8 FB2914E4           - call Borderlands3.exe+4149B0
+Borderlands3.exe+1C2D1FB5 - 48 8B 4D F0           - mov rcx,[rbp-10]
+Borderlands3.exe+1C2D1FB9 - 4C 8D 05 303318E9     - lea r8,[Borderlands3.exe+54552F0] { ("shift_service_id") }
+*/
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24117</ID>
+      <Description>"-----------------------------------------------------------"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>554E4B</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>51</ID>
+      <Description>"Think I deserve a cookie? ツ"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>7C7570</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>52</ID>
+      <Description>"https://www.paypal.me/sadjuk"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>7C7570</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24345</ID>
+      <Description>"Third Person XYZ by screen names"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24343</ID>
+          <Description>"TP X"</Description>
+          <VariableType>Float</VariableType>
+          <Address>"Borderlands3.exe"+062AF570</Address>
+          <Offsets>
+            <Offset>170</Offset>
+            <Offset>48</Offset>
+            <Offset>70</Offset>
+            <Offset>30</Offset>
+            <Offset>28</Offset>
+            <Offset>60</Offset>
+            <Offset>A30</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24344</ID>
+          <Description>"TP Y"</Description>
+          <VariableType>Float</VariableType>
+          <Address>"Borderlands3.exe"+062AF570</Address>
+          <Offsets>
+            <Offset>1C4</Offset>
+            <Offset>48</Offset>
+            <Offset>48</Offset>
+            <Offset>28</Offset>
+            <Offset>60</Offset>
+            <Offset>9A0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"TP Z"</Description>
+          <VariableType>Float</VariableType>
+          <Address>"Borderlands3.exe"+062AF570</Address>
+          <Offsets>
+            <Offset>178</Offset>
+            <Offset>48</Offset>
+            <Offset>28</Offset>
+            <Offset>70</Offset>
+            <Offset>30</Offset>
+            <Offset>60</Offset>
+            <Offset>A30</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>LuaScript = decodeFunction("c-rlKTWlLyn%+h0L^X$D+%s_}yL.=vx7zYWwke6S+xKGUi/C.1ZQ1IvduDn(hEP)KEVg.kl2lu63?{x*O{l.R36PgO%*Bi0667U8-hu!jWw$*zZf]IFf{n#0NdWC]Uh/Nc0C_Y;ol[T9?g}YPcBg_ORAQa}^O7-*_6J/AcP[5TSIFD^BosIh.QhSczxp#$^T#g,:Lm/B_H^+1:X;{!h^I2aHW.Vhnl]AhvOZX5WqlA0P,l91)^F8UP-ErWgJo8{JxDyXd{lCDzqLF5a@fyWyhMz9iLQCcQ[4g45UG,RC2oQ!I@oJh@E?Zo^pW:H]UufTA8]19oSVP0AZI66]MyF=E}XZwR93k;_Ao3x1gxu2%q;r?stbJJx;}%vxL8n(d?oKf/])4iY,Amh:J[zn#%VH[E#]CSG:P0o.F6q_7m9%Gy@%[%ugde(Ss*g2Y4w77tHAdyEXmpHY87-f$9GI.Q$?b)x_}tx*K!):oyg?CHJ[HVN?3([AbpBy-9F3AefP}%zI!3B%0:}RDg(NfGjb^]/=/Q6YdQ-dzLe9v_8ka9atuF6_IyPu=E9[D[!4oH.(D:eUwoA}kvNg]!-j]ZaS)pvL:Lu%!=q%]ZAll(CeGJ!KBMcNc?s}paKK5Bzv5[[)?J6jcnOC0R{=2s7.IhF$flkkaI1F/b*6dtujGO65:rvZ17W.]OyGcPJ!P-vA-qQ7JP7g^[XOwO4nmSRZsX]rXq{yFNiV*h:f*HE(4b1qdFnkF:e4QCQ=Ih75h1;_b{.VMq(36]%EY7b.s#Idp=*3Z3eJ}2oHpg1/nKKxd.j^$gm2wTI3-EQ@}C?E*l{kJuL9ariAnZ-#6vh5SNo[BI+$M1[_N(C#X^y%t_,Ec+R!g@dm=-gVIe9=UM(:O_8hRJfD[w:d:F{8a;]0ty@^J$=R#l^c/:H(-)z?nM$OQ8/#!oHDYueUE}W{aKCqa_7mBPdRLD*PBIJH1r(m/I]@#eDR#6r6dHEI{x,$lMR{qF2xva[uQwXz@oCY)3Xj6,xkSp?L4cb=V]Be6L8pQiJOF}^(6yC3;1.qI,jx[v*aYUHUcKuU*ZIU:aXpk,9aEG*qM{5xegd9Oups@*#9E(XxFdat*$Dw$I94vQehvFjeJ2c.#NYK=i?H}0q)coj@?ok9YAEA8Nv%$_KJRW[G]JVG75:6xL9n[UQ8pqv6Jm2:P+r]16kp4BoBaQF{%LfelTHuY-N7}{6G[?L/,O^,aV%),*]nJqk=.oA4jc95vnuM#7lWRwRq.hYq^yyXcN*xoWzvYbn7NT,4TkTg?/V7URD;ccy,R1w5bQ..4b*^VXRv*p0yZdH7WraN-WChxD3Vj}CgCg{VtQ3*}6=Jme=x5BFfvzD@?:dzNFpelovmF=_h:i@_*9gJh(Q.1r8eT^5P%tb}*#!l9][z0sm+,bRhFqPCNak^p4}7CCe:K{Z5I+^-39}aeVvHzFkBr%4FjE0pBnATyQyaZqp?YM9HQzU3Hf{/59LF;{;-o@cl0dVhVXP:q.gKJaN:q0*Ds/S[IYP(Pb,8gh0*35Wn^hY}WAhf$!e%*@iEuPG[^2Dw!GJ=@0Ud92j4;4s2^,-TV,/llvuQ^eGjttr5xA8EOa^Jm90H9OBIlvw%cc$n8)u:k6M/{aX+)8Y9-hV]Vr}NGcFfUeBQ*j@YhG%WBgBZWJ/d@/4@U%$audUGUCjBXCbQR5NUM!z61}RRY)BTF:8L!Z9s}E3+)5ZDq5fwn[2zOe==_]R]Ny#VC(qx[CMRTbMPZSS1+e:dl;.UdXVYXlr6R{sexA#x75=x5]**/:olgxab5m,jqGJrDW:w6urw5u;4hV%=nfYAWNz2]Tn#9-z99P,y=.S@sDH[IXtxTvNOJ(3xYS!W6QXH^H0_0Rb+Bh}h4#i?vOvfHG*-+=}A!e+t19@_-;u#5=YbJUP,!8,HsCOtTh/R1Gm0J/yqL5bQLXn/iFcT9pYIf!9jv}aIW$vz;Vunu,*PmX!i*suv?c@B@(.2oYpwZO2ksCg$MG_hx1+ZKiwJ20*Iq)eTW3S,hJ+G1pGyINO]DT]XZ-9QiDZ_S,))KHCh+{;h8yO8t8VrG(#=ch6Bh6C7)/wMot!GXX.SgS%):cVi$XhCl/OSKFPT++(4e7=z%U2P{49.it4G(APaKJZQ))]LQ.r,Fk@gh.gu7Y%{h#GT554CV3*AUSdmsg5c*M63CQGq^bT4q9BlvmQlxjA:r51V)_cHC:XyOFvb;!GUi8.)m38{_7vScr_*7OG_2K5y%;EQ^kdtM2^S93L?cur(]NohuPzOye+:6-8qVV?8g5!]PTNmV:0Hk%YK{Iet_mTEbdJuXxzn2yHwENtagQlB6Pf,1lrYp7i:Q:v,qgy5?1731c3Yc#8Sanpa:rjQJ7PC=d_yu=njs.;FU%t3Sb5wx*R^%(X_CNLge2[:9mylRT3Y:GjCY?cAvwyA+UlDM8@H*,}/o$^*3);qgpc:?MNTv.R%!bJg)J?w_;{7,Bj*=)X7v(h_LY^%fxhb#xt#K8LvwIx}U]ZsDwqcNqU?hU]S8fSCxJpNJw6)FyxSqr+.dh*HDBeqF.E?yx[GK!=WJ2D!}=3=9N[YK9}_J}4@5UbC%nt@wx;#S?8#/9H)Jbn!)z3X=(zWtd[zR6NGqiq5?wb8aP*d+EE+Xe=71G_!Col,gHo%vBg_3ZKE@=Q!_3M{iDG+I}9b(M_N2yohhWApf@UTgdNfiypw+;W.R0P22Lf,wk:^]1*%2Znkc#JKE}+wqnIcO0Zj+*7ZR^u52y4-7_d0:9VSct-@JZb/ionZqHyX(f{qb8]O8,l1Tf%Rd1ZrS#1(rU;.rXBy]Sd=SatU4vWt-!#_AACirk0on#ANo8Z(w!5^%XTU00VJ1@Zw33*1vE]]0of[kR;*Vm4)T+7a+GtQBJ$Zd*T^uSL%d}0!+lQ0LSdh(LRZZJK0V-AfN-S8W8XyleD?Yg,b-N+FgeF=.#r@}E2(YkN?F40A#wYZ)Hpr[4eit)v1J])uoYh8rqDVpEzflmc_6vjv6CGgQVta^?dxsiA:j_a;ndIF;bK7jG-hCUs)-wb@@nBTysk[eD;(=$k;Gw@{*$-1FW2i:3JtXcKOIbACxaRBDgHv)jHje3{LY#I94e4ZKlFg{}$!,C;b3v[5s=*1WM.In1u*3FIYT,+sH(XMEEZ5*7kDr-UFyB)+nj^e)BAD]]=Crlq7@G[1}c?iZ3AmMug_A3DUKK-_uK0aR)KJj+(@}O0yA?T$VU;,^nO)gKaipZxhKAO#Eit)v1J])uox4Ve}IuiKY1D@]]D2$KhlfXxRV$}bxW$@Iw8ijcz=,hs:X9)q=-wu%%w^QD:PiIJ,+E,ws/NZzl1jfAy$T!hL]X=akQ^x/Sold(v2bjlq:MoX0qW%t^y7=g,lhZc:8{PkGJ4U0_L8F)[ATAnrdWrtD7m;G%)!x4Z@fMhnN1xb56ttD?%%UCfE8vBBmVYLm?Jml.$rS$wzdo@;lv$m_;fCVXdxzP=FWvbBd//N!V-JaUXhfgfL)2H)N,_nK-b5MSTxTDNcM]uo*kl7Nr=bnD.R;ZieZb?@LB7h/KC,Iw5/dg@!)/*u9U{2A7IUcQCc_V4@[zFD5}O1=)Lp1Wbb,UTYeMsELVxaVFA:^D6TM=E+/$*vSbN[j;@QlX@iRTecW0?+UHx_n2l*fOZ*Zto$0q?CayRHvxMslb!k)a}-]z[p-:ghZX3qe#C,O*N]-lR166isWfO3}@hiCx[@rkxg5YR!d%.1@/2R)gqAF15k2PM#!)W?_eCD5yMyhYYQuLOF}DX/QD?eUIF$CLjtFh{A,x)_J,qY?}A^:JS+f*(swK8mL=yb_bFK%XnUMZ][eGUN=1]%TipbU*bw^Y{uvj6Apn]p]GH33_@u^t*D)-S8WQYX%)jIB7p/@$?+.wx9;!2d(s-G(fC{9iNeq@aI7A?ezD,[Xp)a4bVtX8C]JSChYC_q,0_)(8G$XOR#qb:==ieh:jT,-ygbl*RldtTR_P#cT1a{5#4uyC=!UxTawTZC6pzIxM]fzSo3yj6y{jih_dy)b#c!Q)D*1Jo$ruxrxxJOy,h*DtxLa.vY!OF-:o}61?x_WNx2L7:iepq0Pq8-4+;rm%0b_Nhx#B1a?^^6?oo}-FaCs-?y$I)Iiv.k7bu5FH]jBJ^MOeKVzT+WAlpG)=nA@[bxIQAr+zPezjPJ45%SbWuPT{H)^]Ip,W8I^=R:k,67VX)TlZm3Tp}tUIz-mdZnHE.LQ[9/L-*^?q.Z=T[jS$=?!28L--+;L?L9Q2ApQ41?7@4FJoQ7U,)},rDJ.[NAztqxmptnwoFBR49]k;X/$q{kvP:O!McbkeP{xDJ*cF}CF=G,sj]K}N6F:$Q!nyB0]qR1nME[k6sodXB]tMVEWS5:m(Y[R}4*Alp@=ycY(iz1fXg:H)x:-UNvCDTqL49Y#XX09K$X[PX=]Dvd$gavc/n42i^r)(*Z}A8lH!YAYKkRc3i@g+sqy+fuU*#k@V^8O(3AnWE;w,!5hAp{Xw,]IL^tdDTT,(5$i??Ci=j}=*Spu(9dx0px-2)0l$mje042]4RI(k{@k?LTvW91TXD[!rAb;Q_-6B3(K==eKw*/yPIfU5vk0xm6Y0,*O69?zq{0$j=cG;x)4Ym6/we}-NQ]s,Qu:in32]o4M4@[%_l.By^hLEtdyKM%V-H[kQGKM80Q:HbpCCej0VE/nP^12ztZ=Q!rq8wbP8pXcGv2ZxCQI=^8Dg8[[#0m%0NHUf^z@TT8vb+1OVISFdvWKg3pPw4?2(jZ9s?O;g*c%Q64V7{dJ]L,bwl=U$_=H_n2enoMp5BHXyBcBC6+.[fko6-baGvE)C0iX97Obqsu_8oA{UfNzi-w)O4E)sEHAxL:rA/EzN6R!IMB3{G{:#M?imG3[wT/8c9XO55=7YGj.]?_qeeiJ17D*=Udu2Yj9A-+r{CzVG;NN1;fpYn+s[kJcbU3XrDJ-$Ceo@@Nc/3a:Ex80$*m5Z;:#p}qpqrW4Yk1#*d^C8yQ5#j#BqX)$dxGCTsD+w(=gJs$tdFlHB!rFXqoR[/iqe2;md9FYF-?m#L*cktzD5,dHO1MWyiTM3dqIVx7m5av,[xKnQUmPQP:s2m(94Fj2$BFpY$BEu@f;bV?Al$D^5b?ugAbRg0bVRh+;KN;);UeSRjp:y)!vFb_@bm9)4#Mt)M0v;O1pDl}Z}-*fCy8/abS?,r9y_ZeI4^GWUf2OJk8}je+h#YaU55C(vqZX;rSv=dhgot,d$@BYW0SrE=1DxZZt!#qTrYU%K/[l/I+oXUpdPXL9pdZ4?;{4$Z}Y/R(?10!G5K)rFxUlS_KN#p$1Z$28jU5Qqi4?XW3h=o+hCE9iO9rR@An93_6=CUM]L4=G3Nz%AG]Y4X!HB,0btFU,v?_*(9$y#F1wPMSMz/lNZqpExvgOB1?)1W*w??,dG(g#P+n3++hY1A1Hac?5f.y$l[Vx}bT_s{lTa/m(Hx*rTCm7yRZRmvO4Xkj8s+/%8W]k%sxCTp::)R8XdU+p:agE!nwPT$x;Y_bFWiu=t9@T]n-YbuE}z*o;skQ_d]vPR*Anv;eoibD*O;Mz)YWKFm_s}a:JI^VtR^zyt7LYaL12#ED3F!Y.Uv^#w5lo7espwnEIKqA#c;A5n62@1Wb#ZT78$Xf9f=Fo]NK?{,RJe,C*Qo83!jJ%C1R1G2;Tc(beMLc8c(lS?.[k:96LfT/A(^MaPAqs9},4!EE,?LkQ[5zJ8W:]#:;VA-Bfl=tleCmo6Qv+W:]fZ%egE)Rd8_,pIW-HgQhgbO!bB*lMZDQ(Zx3tE5=L1q0xwxI1=KRN0]8)NPRqaMJ:,E$+eq_2A@}}RY;KsF1sIUjT.[A^Ej9g5h-RfGd;7]5ySb;4]UNzf[4x3F?z6*#02;=nU*KMxg?*n.9?F!L)D3oq9m76X,;JeE*;C^a5Xn0FT2ckqWyN@KZ^08LF^O3Wxs0Qj77s@hLDp^y5}2gX6I){sV}8C(h8DLTHIVlJJME??MVa$BY[,ar8q-wjBs;(ahcs+vcA7PKI]KnRKUrY#V$577Nfm*ENTi9vHy:G0ZWeHFiXR,/VbkX6t4ND!1k@u*=ZS!Z.;%]BOhE]NvFjH1Gvk_m)$rarI:ho%+?DHneNs$,R[eNmvNkk0_O190_GOTQ{8{#^T!;VyH2#/b/xgowJ79bd2GPVtF5a=wRZq]KllY7l2=j3n(mU-x#5=.HHW!=fKOVUSJOv?9i@eUoN$aawnjkX8t$u7F-53v$vQMFP-w!gbqgo$[)fxshzz-T,VJ5f?R26*XcPEo6Zn{X?G)o!2EjSbDl*k+h5W,mV19m.l@5i6S_{^#@2JvAGt=crW85@dtYp.84xKqDjF{pKky,kZ)-UKc1!Q@yoG:s-l1T(5LcMVVLlBl%3QK{z8mm{Hxr(NaEUe6/a)QqxVgi[LmDC^Y;x9UwgP#L+(4e,F_0TV}BrF(6!sn/zF%+qm6NJ.J;xCR2N6KRNOPI{1pI)4Tob8p:iBU0jZO^@/L4EipswsVEKsaSAKx*}N]irdU2(tBQ6Oq/?@A:y4xh)PxsHaugFjRfMyJibu+q2)/WbLxM2?k+g#,:Px6Rb}-0CpcxERBn5p}y(7L2fA-u-fg%9V#/QvZI.No2t2;hAWMQ6C/_p25U-V!D.@+B12{CtSIi7Th1+zLXwpVu96,hd9[%h#[,g9w9i5I#2CUTKfi2)S95tmonIbQZAcX^.zTrJqZ$#[8XF#7W8h^ksW*46$B{@.ZWtLBJpA%,Jncq=Z9}I7w0qc}MzXpMJF:7b7:07+F.XKzbiB5A!zFH%Q5VWQWo$UM+4ME+k5cR@q:7hRoX);=*46:SR?V)v(eYiMlCnmfGj,inh1}PYX-6;UKU4.B*FO[!qMnHr8=1JmDxQm:m36A),la(U1YJQ?MFhoa=[%n:ULLz5zMA@0?nyrqF9*nVSX1o_$ZGPGn-5XSDy$iEISzTjN+Oht7#n_s$+OJ]-[c{X,?3:.m:LkLEZ7cH$[=-PdcB+x-fc1Ez^/Hr=e[OEzRulYyY01y@[0jS]+bGvr3(eb.Zp.3uvRofiCiviFG(v9a/E9*uHi%TOjRj.i;?yQ2AstK!AZ?zwPN2r6EZolO$5GYJ{GAt;V%wuV-@1BfUDe.9N%TFop}Od]2z#@KOk5?+P5t$3*sJ}[RjV/y{g=@D;^G5,!cQLul*6kq*%NV8aOvumo(p]MrKZ3O%,=:^9I1oXp5Hvu[;W#xlJvhbGF6KiP?ag[6(1Md,cnyW?P3rVd1_W(gJa37;kSBq0C}H-BKwdR{=O1,YA#ozLPG7VymmU8Cn)fUbku+ILNNbDYb?hR?GX-QFkdv@Hq)I@{AcmR[*C)O.UeR-F}w62VJIWLbuIkZ89-8qYHCX$m#52=iIN/qti$X%N{#;c8^I4-U-VVDPX7Vcc!V!Ub7gCGKJSuzB$32,T#t2*_#Z1Q_#6*l4Jv%]sS@YdL5RN#(Y4SI:U3r0M*G[o(L0(,TFO#$,bN,Ik6eKF_dy{nWWZ?$.L#},A$i51zc.hg.l{1BBkX(uivVvuG6qU#LB?(pI.R_Iw^o7CIgP8F;5uCNqj7Jtzj!]o;s#MO}Nn#hjZ23x{}vLov(@$V!7LReo_ePEf/8/OlD,_^(TL=ump:amyrv]GSV8mt}FXq8J2^M:q*u^a8k_3td7U6*k-S6AXJw^beZc_0Kwv?J3d[9=Q+Po:N%MOd9}4M5MWa/EEa@Dsp66lISH#{Qdya/WowqpranfKW#Qz/RH0wewso5Yg.W*js@2IQx=1c,vi-.8nQA!IFH4Naw]SBr0WPG)PM;B=x5KQ8s-y;pYFD81tIm,0ry+Y)QeCEut+.rncY$Op*RX3xDj=J-lxp27q.8v+2K,y7qg_I3;$0)y=sD$zEYc#SfiPCw8?/s*@x9xFV)!J)ERIfo;_6xF9+c6ip#E9FvQs@_?XLQ_FY/Rvwae06MZ{F)i]Mo*SN#Tdmpf]kMMMo*e%gGQH$HxaK3.A;XOJ-*r$=3(jE-n,8kjk/]9=tfQsl;,WdG-zOtSX6=DeuNCG*2:]wx[6=Va]ik2CGRd{Enb(MFO4EsMc}B)._rF}xSI,XghlFTb[)=W;S;/:l}fz=@Gmh{TNGY*1TJ(bt5WO:jKd=$qn0T{J0mdH2VYciDAP:%p(FKbqA0vi#$pI95B^;t)T:?+}b,_Lo1:E[1Wn8D=Lt))XPuf2+jPX#*H^9AciMTec?Zc3xyTdaN2{4O?o*ws{iykeAblM%NJEa5tS_G{=$CHv*_g,?KU$O-O=41NJP2tyu%LWSx40a:I!fg3u*?YksUcN2sR_ei@iT*:ntZ4,C@Z-RwH[3T88VuuBI]EV8(b=p!?GqeLS?omJ?U/kgKrTW?2N_J2ovO:/]:G_A#),cs(}*mfMuR%t{vxEgV-Nn1wOXxwOUcMt8YhwhdGw;4{#2kmW!=79KlIb82{ux?v#-q{Fi[=Ea:AE$RPO26XR.JA!tc+J!Npfz9(N9t7+;Oaux@FYmwf]ZTxvBogQ^eex.SmtzeIN-/Vttye#Sj1$TS]=02[YodFhJoFoS8enxHkL@E/uB[d5:!b=Gof6![cT^:J0*#2rleE1p-99fUNiM)*vSW*%dz?-=P5bUuetJAGd+orZl_fOK,Szbj,tQ%S{TLN@mOxAnhE,UVzRk^yxI!Q6jRxmnCgN#Z:qgvw]l0LI.kuJHj#=nv7t8YRhYKDw?sYbl-Q)x!MHD}URu^C0Y$3]$XYZ=ts1;/30+.F/+DI[4RYT#W#lgBAkn%%*}21NJ#q)Wr*g)%=@#pZIJ;Mdz;P[Dif:ENQ-hYOzODvl7[[0tq+Sj,jrW_MYj=ykFJ0ETmaQoqvkV2)48/_Km#a7R71ScKTt1er$]rFJ%@L)*jaf.o$)Vfl@cOXEb3@.#gn0^KgSzm]jJ222M9nrYu*CLH!!-iBE;2%-tiChF+X{(L]c=jGwc9lfL?@[.t+5ov]nL^oe7qjBcGzve+h(R/^Ka-2bJe{PKenigw1}Qcp+Ik9[1l.(..y/o[vRz7$xR%sV$Zo+]1c%rRn_L;zthL-z0:?!r*]_#GT!ACtYI9[1=/Q;HGWWwrbW!Vv7JvFRGrY0eLLQ$d-Py=ty*-]ejh([cy,@W]:}_R=rm@Wo{1(*n8TOID#OCgKM3I!EXPNNg-a[Ln?@y5uWRRiI/]k8F-)gjeIA%r9T)h8%,,Tbq0@pq9eb#,VhiKh)FTu_R.NVmKjvIZ,-QmXuzgckq+#7#9x9GodW.ZJZVCgRUs:f{R5@2PTv*]c@5n/D/x8gq1_!=hsNMunPvrD/cKa43B{r{2atsPJ#Hxhak%=^NHKvnOc0_S6%xglXJ+{*Au2!Tj/ph!99LEH/P+Cxwv;?%8j,kWsQfLF*Vc[QY#[fV8,PpA.LUU29]v?KAwAj4Ct4^{Q!MD9n7]-R58i]o::KYT=yE5:(wqaJIquX[Ty7.v5,ej6[uhNf3h9hSpk:FRbJET7x,Zq1I4)X4=whNrsnQy)8b6IxylXL)6oZHT?-q?op=s0c]tNpIq!qe@F:3ejhZKJAH1Q@e?HJFg]9{F}r8n4Ze(9@%!XZapie(-JjxXN_t]x?=Mm}TKf-mJW/W)=r;H)8DHd,Kf!/ooLHW8uRM%vjqNLiGK?dS2@5)?p-qNT;CB:1(bUeHql.Qh1ELTZ,AwsQS^9kx0@hK{mFIRKhWdV]5Yqoy7k^a*f],dZUj=ZjRD)y[:,GY0kllKbV-M7cxwtPPs}RNxpYN^ZdWSC*sAz^Eb5R#DE+n.u+d0e^.Q{!@ySzD;(,}j8WWaoAH3PM[0qTr6#A]atkMDGK@jm^,x!dXm(b!EomqU+k$:f@Q%d0mv$)6BK-1u][X@2l$9?5po:1.ib5fW^^sc}ItoEa/sl}Km5cdYMkp=,H8vX+melM57K:rC3x+(s/S]8rR,be@eG7qx4]qK+x3p_?M,$;_So6d%d*9cl[MzfJs;SOfhKJ4jCk)mA$7hXK*_hWPr+3gxHj(eV[LIZaMeqsHc%Ihn.o7%$IBN%mQRiDZoK,]Ao4_);(7R_RqE).Mbww7%;=0oQ-E32-FV(:6SmL_s+/=PYq+gL}FD+;v)u$g8zik$z/%:{93Vip4R60GGRWm8I!0*-Tj7hC^Q!V5(;U2?f6wt{D:}M:pNf9%d91;ABom.perqfA8PA-%BN.XpEfyC=[.+}_{DaScFq-TKN+Z7f9[b(w8x027h*$}@^)7RYaUcQ-C@9:%=4;1F+/nxHmTQEXi(K6BYd#R#gRoBjoIayH@^[V=IS3eWMm?ZBgem5.%y_t]PW^uS_-+-jLf2rnOO!k.C2dljXsD_Ng1IjcqRC)Kg7$+Ihx_CW-tC)ID.UNdsUZcLo-hB.P=J.0KSLNkg[R5V@*@2QouI8}SRe@W[wxjQNI*!g^lHvRQB9}RMMx9FM:H,x?LN3buK^xD[yT{Uz@:.hwJ7ZjCo:C}+,.#pZKUL9+RpF^UZ^!!p(kvmCdox9p7gO_QO7yW}UuOO?Sg#^9e/[DTo*#MaWZyeU[LF[W0(]8#LG};DO__8f.wLL:^uX/bo8ndL]40RW:K}3O.YMLuUQl@Ht!5kj24IsP8Tj],A@)_YKkD;0ijz2mIML]!DJO{;euLn;IAK4sHbsB3C9V-ki+u!Noc:HqH@+K!$yMv)qEUx7k_uH#M)NCyD]Xnq@aYQ8+H5xoKmNwQOP_p/a@3WV1nZgw[JTe8rwa,,4VP!lI@%}8=N;a}w@eZ-u8FGF:l:o0vXwv")
+LuaScript()
+</LuaScript>
+</CheatTable>
