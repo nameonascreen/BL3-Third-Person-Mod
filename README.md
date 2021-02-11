@@ -5,3 +5,6 @@ UPDATE: Console enabler / dumper is no longer required. Hotkeys are able to be m
 
 Tutorial: https://www.youtube.com/watch?v=mq2Txtho38k
 Nexus Page: https://www.nexusmods.com/borderlands3/mods/252
+
+
+https://www.youtube.com/watch?v=mq2Txtho38k XYZ CORD FIX TUTORIAL!
