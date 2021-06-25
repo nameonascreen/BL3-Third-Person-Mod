@@ -1,7 +1,8 @@
 # BL3-Third-Person-Mod
-Mod that allows BL3 to be played in third person with ease.
+PSA: THE MOD IS BROKEN RIGHT NOW
+I'm looking for testers for the mod, I'm currently remaking it since the latest update has broken the newer table and i need 10 testers. if you're interested please shoot me a friend request on discord screen names#6440
 
-UPDATE: Console enabler / dumper is no longer required. Hotkeys are able to be mapped and everything you need is in the cheat table!
+
 
 Tutorial: https://www.youtube.com/watch?v=mq2Txtho38k
 Nexus Page: https://www.nexusmods.com/borderlands3/mods/252
