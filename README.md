@@ -1,11 +1,6 @@
 # BL3-Third-Person-Mod
-PSA: THE MOD IS BROKEN RIGHT NOW
-I'm looking for testers for the mod, I'm currently remaking it since the latest update has broken the newer table and i need 10 testers. if you're interested please shoot me a friend request on discord screen names#6440
-
-
-
-Tutorial: https://www.youtube.com/watch?v=mq2Txtho38k
-Nexus Page: https://www.nexusmods.com/borderlands3/mods/252
-
-
-https://www.youtube.com/watch?v=mq2Txtho38k XYZ CORD FIX TUTORIAL!
+How to use:
+Step 1. Set your XYZ Cordinates. These are the pink boxes labeled XYZ Angles. Open each group and select only one of them to change.
+Step 2. find a camera cvar and right click to open the hotkeys menu. Click set hotkeys and create 2 hotkeys, both hotkeys need to be set to "set value to". 
+Step 3. Right after that you'll need to enter a value. find a 3rd person camera value and find a 1st person camera value and input both of those into the "set value to" boxes.
+Step 4. Profit.
